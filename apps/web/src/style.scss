@@ -1,12 +1,26 @@
+// Variables
+$color-primary: #646cff;
+$color-primary-hover: #535bf2;
+$color-primary-shadow: rgba($color-primary, 0.67);
+$color-vanilla-shadow: rgba(#f7df1e, 0.67);
+$color-dark-bg: #1a1a1a;
+$color-dark-page-bg: #242424;
+$color-light-text: #213547;
+$color-light-page-bg: #ffffff;
+$color-light-btn-bg: #f9f9f9;
+$color-muted: #888;
+
+$font-family-base: Inter, Avenir, Helvetica, Arial, sans-serif;
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: $font-family-base;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: $color-dark-page-bg;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,11 +31,12 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: $color-primary;
   text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+
+  &:hover {
+    color: $color-primary-hover;
+  }
 }
 
 body {
@@ -50,12 +65,14 @@ h1 {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #f7df1eaa);
+
+  &:hover {
+    filter: drop-shadow(0 0 2em $color-primary-shadow);
+  }
+
+  &.vanilla:hover {
+    filter: drop-shadow(0 0 2em $color-vanilla-shadow);
+  }
 }
 
 .card {
@@ -63,7 +80,7 @@ h1 {
 }
 
 .read-the-docs {
-  color: #888;
+  color: $color-muted;
 }
 
 button {
@@ -73,27 +90,31 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: $color-dark-bg;
   cursor: pointer;
   transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+  &:hover {
+    border-color: $color-primary;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: $color-light-text;
+    background-color: $color-light-page-bg;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
-    background-color: #f9f9f9;
+    background-color: $color-light-btn-bg;
   }
 }
