@@ -1,25 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { z } from 'zod'
+import type { User } from '../../types'
 
-// Zod схема
-export const UserSchema = z.object({
-    id: z.string(),
-    nickname: z.string(),
-    role: z.enum([
-        'Frontend Developer',
-        'Backend Developer',
-        'QA Engineer',
-        'Designer',
-        'Manager',
-        'HR',
-    ]),
-    token: z.string(),
-})
-
-// Тип из схемы
-export type User = z.infer<typeof UserSchema>
-
-interface UserState {
+export interface UserState {
     isAuthenticated: boolean
     user: User | null
 }
