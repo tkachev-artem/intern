@@ -23,10 +23,14 @@ const FormUI = () => {
         return createSchemaFieldRule(z.object({ [fieldName]: FormSchemas.shape[fieldName].optional() }));
     };
 
-    const getStatus = (field: keyof FieldsType) => {
+    const getStatus = (field: keyof FieldsType): "error" | "success" | "" => {
         const errors = form.getFieldError(field);
-        return errors.length ? "error" : "";
-    }
+        const value = form.getFieldValue(field);
+
+        if (errors.length > 0) return "error";
+        if (value) return "success";
+        return "";
+    };
 
     const getHelp = (field: keyof FieldsType) => {
         const errors = form.getFieldError(field);
