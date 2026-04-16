@@ -20,4 +20,4 @@
 
 **Фронтенд:** Vite, React, TypeScript, Redux, SCSS.
 
-**Бэкенд:** Express, MongoDB, Mongoose, bcrypt, JWT.
+**Бэкенд:** Используется Strapi
