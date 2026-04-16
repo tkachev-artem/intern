@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Button, Form, Input, Select } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import FormSchemas from "@/schemas/FormSchemas";
@@ -15,9 +17,20 @@ type FieldsType = {
 
 const FormUI = () => {
     const [form] = Form.useForm();
+    const [, forceUpdate] = React.useState({});
 
     const getRule = (fieldName: keyof typeof FormSchemas.shape) => {
-        return createSchemaFieldRule(z.object({ [fieldName]: FormSchemas.shape[fieldName] }));
+        return createSchemaFieldRule(z.object({ [fieldName]: FormSchemas.shape[fieldName].optional() }));
+    };
+
+    const getStatus = (field: keyof FieldsType) => {
+        const errors = form.getFieldError(field);
+        return errors.length ? "error" : "";
+    }
+
+    const getHelp = (field: keyof FieldsType) => {
+        const errors = form.getFieldError(field);
+        return errors[0] ?? undefined;
     };
 
     const onFinish = async (values: FieldsType) => {
@@ -33,12 +46,19 @@ const FormUI = () => {
             form={form}
             name="basic"
             layout="vertical"
+            style={{ maxWidth: 600 }}
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            onFieldsChange={() => forceUpdate({})}
             onFinish={onFinish}
         >
             <Form.Item<FieldsType>
                 label="Имя"
                 name="name"
-                rules={[getRule('name'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("name")}
+                help={getHelp("name")}
+                rules={[getRule('name'), { required: true, message: "Введите имя" }]}
             >
                 <Input/>
             </Form.Item>
@@ -46,7 +66,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Фамилия"
                 name="surname"
-                rules={[getRule('surname'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("surname")}
+                help={getHelp("surname")}
+                rules={[getRule('surname'), { required: true, message: "Введите фамилию" }]}
             >
                 <Input/>
             </Form.Item>
@@ -54,7 +77,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Никнейм"
                 name="nickname"
-                rules={[getRule('nickname'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("nickname")}
+                help={getHelp("nickname")}
+                rules={[getRule('nickname'), { required: true, message: "Введите никнейм" }]}
             >
                 <Input/>
             </Form.Item>
@@ -62,7 +88,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Почта"
                 name="email"
-                rules={[getRule('email'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("email")}
+                help={getHelp("email")}
+                rules={[getRule('email'), { required: true, message: "Введите почту" }]}
             >
                 <Input/>
             </Form.Item>
@@ -70,7 +99,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Пароль"
                 name="password"
-                rules={[getRule('password'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("password")}
+                help={getHelp("password")}
+                rules={[getRule('password'), { required: true, message: "Введите пароль" }]}
             >
                 <Input.Password/>
             </Form.Item>
@@ -78,7 +110,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Подтверждение пароля"
                 name="confirmpassword"
-                rules={[getRule('confirmpassword'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("confirmpassword")}
+                help={getHelp("confirmpassword")}
+                rules={[getRule('confirmpassword'), { required: true, message: "Подтвердите пароль" }]}
             >
                 <Input.Password/>
             </Form.Item>
@@ -86,7 +121,10 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 name="select"
                 label="Кто вы?"
-                rules={[getRule('select'), { required: true }]}
+                hasFeedback
+                validateStatus={getStatus("select")}
+                help={getHelp("select")}
+                rules={[getRule('select'), { required: true, message: "Выберите роль" }]}
             >
                 <Select
                     placeholder="Выберите роль"
