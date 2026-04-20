@@ -42,4 +42,17 @@ const SecondStepSchema = z.object({
         .max(64, "Максимум 64 символа"),
 });
 
-export { FirstStepSchema, SecondStepSchema };
+const LoginSchema = z.object({
+    nickname: z.string().trim()
+        .min(1, "Введите никнейм")
+        .min(3, "Минимально 3 символа")
+        .max(20, "Максимум 20 символов")
+        .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, "Начинается с буквы, только латиница, цифры и _"),
+
+    password: z.string().trim()
+        .min(1, "Введите пароль")
+        .min(8, "Минимально 8 символов")
+        .max(64, "Максимум 64 символа"),
+});
+
+export { FirstStepSchema, SecondStepSchema, LoginSchema };

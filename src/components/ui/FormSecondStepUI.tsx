@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { Button, Form, Input, Card, Layout, Tag } from 'antd';
+import { Button, Form, Input, Card, Layout, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 
 type SecondStepFields = {
     email: string;
     password: string;
     confirmpassword: string;
 }
-
-type ErrorsState = Partial<Record<keyof SecondStepFields, string[]>>;
 
 interface FormSecondStepUIProps {
     schema: z.ZodObject<any>;
@@ -21,7 +20,6 @@ interface FormSecondStepUIProps {
 
 const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, onBack, onSubmit }) => {
     const [form] = Form.useForm();
-    const [errors, setErrors] = React.useState<ErrorsState>({});
 
     const getRule = (fieldName: keyof typeof schema.shape) => {
         const fieldSchema = schema.shape[fieldName];
@@ -30,26 +28,6 @@ const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, o
             fieldSchema
         );
         return createSchemaFieldRule(z.object({ [fieldName]: preprocessSchema }));
-    };
-
-    const getHelpTags = (field: keyof SecondStepFields) => {
-        const fieldErrors = errors[field];
-        if (!fieldErrors || fieldErrors.length === 0) return undefined;
-        
-        return (
-            <div style={{ marginTop: 4 }}>
-                {fieldErrors.map((error, index) => (
-                    <Tag key={index} color="error" style={{ marginBottom: 4 }}>
-                        {error}
-                    </Tag>
-                ))}
-            </div>
-        );
-    };
-
-    const getValidateStatus = (field: keyof SecondStepFields) => {
-        const fieldErrors = errors[field];
-        return fieldErrors && fieldErrors.length > 0 ? "error" : "";
     };
 
     return (
@@ -63,23 +41,11 @@ const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, o
                     name="secondStep"
                     layout="vertical"
                     initialValues={formData}
-                    onFieldsChange={(_changedFields, allFields) => {
-                        const newErrors: ErrorsState = {};
-                        allFields.forEach((field) => {
-                            const name = field.name[0] as keyof SecondStepFields;
-                            if (field.errors && field.errors.length > 0) {
-                                newErrors[name] = field.errors;
-                            }
-                        });
-                        setErrors(newErrors);
-                    }}
                     onFinish={onSubmit}
                 >
                     <Form.Item<SecondStepFields>
                         label="Почта"
                         name="email"
-                        validateStatus={getValidateStatus("email")}
-                        help={getHelpTags("email")}
                         rules={[getRule('email')]}
                     >
                         <Input
@@ -93,8 +59,6 @@ const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, o
                     <Form.Item<SecondStepFields>
                         label="Пароль"
                         name="password"
-                        validateStatus={getValidateStatus("password")}
-                        help={getHelpTags("password")}
                         rules={[getRule('password')]}
                     >
                         <Input.Password />
@@ -104,8 +68,6 @@ const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, o
                         label="Подтверждение пароля"
                         name="confirmpassword"
                         dependencies={["password"]}
-                        validateStatus={getValidateStatus("confirmpassword")}
-                        help={getHelpTags("confirmpassword")}
                         rules={[
                             getRule('confirmpassword'),
                             ({ getFieldValue }) => ({
@@ -132,6 +94,9 @@ const FormSecondStepUI: React.FC<FormSecondStepUIProps> = ({ schema, formData, o
                         </div>
                     </Form.Item>
                 </Form>
+                <Typography.Text type="secondary">
+                    Уже есть аккаунт? <Link to="/login">Вы можете в него войти!</Link>
+                </Typography.Text>
             </Card>
         </Layout>
     )

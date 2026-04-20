@@ -1,12 +1,7 @@
-import FormUI from "@/components/ui/FormUI";
+import LoginUI from "@/components/ui/LoginUI";
 
 const LoginPage = () => {
-    return (
-        <div className="login-page">
-            {/* Форма логина */}
-            <FormUI/>
-        </div>
-    )
+    return <LoginUI />
 }
 
 export default LoginPage
