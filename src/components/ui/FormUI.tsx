@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Tag } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import FormSchemas from "@/schemas/FormSchemas";
 import { z } from 'zod';
@@ -15,35 +15,44 @@ type FieldsType = {
     select: string;
 }
 
+type ErrorsState = Partial<Record<keyof FieldsType, string[]>>;
+
 const FormUI = () => {
     const [form] = Form.useForm();
-    const [, forceUpdate] = React.useState({});
+    const [errors, setErrors] = React.useState<ErrorsState>({});
 
     const getRule = (fieldName: keyof typeof FormSchemas.shape) => {
-        return createSchemaFieldRule(z.object({ [fieldName]: FormSchemas.shape[fieldName].optional() }));
+        const fieldSchema = FormSchemas.shape[fieldName];
+        const preprocessSchema = z.preprocess(
+            (val) => (val === undefined ? "" : val),
+            fieldSchema
+        );
+        return createSchemaFieldRule(z.object({ [fieldName]: preprocessSchema }));
     };
 
-    const getStatus = (field: keyof FieldsType): "error" | "success" | "" => {
-        const errors = form.getFieldError(field);
-        const value = form.getFieldValue(field);
-
-        if (errors.length > 0) return "error";
-        if (value) return "success";
-        return "";
+    const getHelpTags = (field: keyof FieldsType) => {
+        const fieldErrors = errors[field];
+        if (!fieldErrors || fieldErrors.length === 0) return undefined;
+        
+        return (
+            <div style={{ marginTop: 4 }}>
+                {fieldErrors.map((error, index) => (
+                    <Tag key={index} color="error" style={{ marginBottom: 4 }}>
+                        {error}
+                    </Tag>
+                ))}
+            </div>
+        );
     };
 
-    const getHelp = (field: keyof FieldsType) => {
-        const errors = form.getFieldError(field);
-        return errors[0] ?? undefined;
+    const getValidateStatus = (field: keyof FieldsType) => {
+        const fieldErrors = errors[field];
+        return fieldErrors && fieldErrors.length > 0 ? "error" : "";
     };
 
     const onFinish = async (values: FieldsType) => {
-        try {
-            console.log("Успех:", values);
-        } catch (e) {
-            console.log("Ошибка");
-        }
-    }
+        console.log("Успех:", values);
+    };
 
     return (
         <Form
@@ -53,16 +62,24 @@ const FormUI = () => {
             style={{ maxWidth: 600 }}
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
-            onFieldsChange={() => forceUpdate({})}
             onFinish={onFinish}
+            onFieldsChange={(allFields) => {
+                const newErrors: ErrorsState = {};
+                allFields.forEach((field) => {
+                    const name = field.name[0] as keyof FieldsType;
+                    if (field.errors && field.errors.length > 0) {
+                        newErrors[name] = field.errors;
+                    }
+                });
+                setErrors(newErrors);
+            }}
         >
             <Form.Item<FieldsType>
                 label="Имя"
                 name="name"
-                hasFeedback
-                validateStatus={getStatus("name")}
-                help={getHelp("name")}
-                rules={[getRule('name'), { required: true, message: "Введите имя" }]}
+                validateStatus={getValidateStatus("name")}
+                help={getHelpTags("name")}
+                rules={[getRule('name')]}
             >
                 <Input/>
             </Form.Item>
@@ -70,10 +87,9 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Фамилия"
                 name="surname"
-                hasFeedback
-                validateStatus={getStatus("surname")}
-                help={getHelp("surname")}
-                rules={[getRule('surname'), { required: true, message: "Введите фамилию" }]}
+                validateStatus={getValidateStatus("surname")}
+                help={getHelpTags("surname")}
+                rules={[getRule('surname')]}
             >
                 <Input/>
             </Form.Item>
@@ -81,54 +97,70 @@ const FormUI = () => {
             <Form.Item<FieldsType>
                 label="Никнейм"
                 name="nickname"
-                hasFeedback
-                validateStatus={getStatus("nickname")}
-                help={getHelp("nickname")}
-                rules={[getRule('nickname'), { required: true, message: "Введите никнейм" }]}
+                validateStatus={getValidateStatus("nickname")}
+                help={getHelpTags("nickname")}
+                rules={[getRule('nickname')]}
             >
-                <Input/>
+                <Input
+                    onChange={(e) => {
+                        const cleaned = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
+                        form.setFieldValue("nickname", cleaned);
+                    }}
+                />
             </Form.Item>
 
             <Form.Item<FieldsType>
                 label="Почта"
                 name="email"
-                hasFeedback
-                validateStatus={getStatus("email")}
-                help={getHelp("email")}
-                rules={[getRule('email'), { required: true, message: "Введите почту" }]}
+                validateStatus={getValidateStatus("email")}
+                help={getHelpTags("email")}
+                rules={[getRule('email')]}
             >
-                <Input/>
+                <Input
+                    onChange={(e) => {
+                        const cleaned = e.target.value.replace(/[^a-zA-Z0-9@._\-+]/g, "");
+                        form.setFieldValue("email", cleaned);
+                    }}
+                />
             </Form.Item>
 
             <Form.Item<FieldsType>
                 label="Пароль"
                 name="password"
-                hasFeedback
-                validateStatus={getStatus("password")}
-                help={getHelp("password")}
-                rules={[getRule('password'), { required: true, message: "Введите пароль" }]}
+                validateStatus={getValidateStatus("password")}
+                help={getHelpTags("password")}
+                rules={[getRule('password')]}
             >
-                <Input.Password/>
+                <Input.Password />
             </Form.Item>
 
             <Form.Item<FieldsType>
                 label="Подтверждение пароля"
                 name="confirmpassword"
-                hasFeedback
-                validateStatus={getStatus("confirmpassword")}
-                help={getHelp("confirmpassword")}
-                rules={[getRule('confirmpassword'), { required: true, message: "Подтвердите пароль" }]}
+                dependencies={["password"]}
+                validateStatus={getValidateStatus("confirmpassword")}
+                help={getHelpTags("confirmpassword")}
+                rules={[
+                    getRule('confirmpassword'),
+                    ({ getFieldValue }) => ({
+                        validator(_, value) {
+                            if (!value || getFieldValue("password") === value) {
+                                return Promise.resolve();
+                            }
+                            return Promise.reject("Пароли не совпадают");
+                        }
+                    })
+                ]}
             >
-                <Input.Password/>
+                <Input.Password />
             </Form.Item>
 
             <Form.Item<FieldsType>
                 name="select"
                 label="Кто вы?"
-                hasFeedback
-                validateStatus={getStatus("select")}
-                help={getHelp("select")}
-                rules={[getRule('select'), { required: true, message: "Выберите роль" }]}
+                validateStatus={getValidateStatus("select")}
+                help={getHelpTags("select")}
+                rules={[getRule('select')]}
             >
                 <Select
                     placeholder="Выберите роль"
