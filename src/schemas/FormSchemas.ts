@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const FormSchemas = z.object({
+const FirstStepSchema = z.object({
     name: z.string().trim()
         .min(1, "Введите имя")
         .min(2, "Минимально 2 символа")
@@ -19,6 +19,11 @@ const FormSchemas = z.object({
         .max(20, "Максимум 20 символов")
         .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, "Начинается с буквы, только латиница, цифры и _"),
 
+    select: z.string().trim()
+        .min(1, "Выберите роль"),
+});
+
+const SecondStepSchema = z.object({
     email: z.string().trim()
         .min(1, "Введите почту")
         .email("Неверный формат почты")
@@ -35,10 +40,6 @@ const FormSchemas = z.object({
         .min(1, "Подтвердите пароль")
         .min(8, "Минимально 8 символов")
         .max(64, "Максимум 64 символа"),
-
-    select: z.string().trim()
-        .min(1, "Выберите роль"),
-
 });
 
-export default FormSchemas;
+export { FirstStepSchema, SecondStepSchema };
