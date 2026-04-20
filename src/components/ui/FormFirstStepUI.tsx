@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Button, Form, Input, Select, Card, Layout } from 'antd';
+import { Button, Form, Input, Select, Card, Layout, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 
 type FirstStepFields = {
     name: string;
@@ -97,6 +98,9 @@ const FormFirstStepUI: React.FC<FormFirstStepUIProps> = ({ schema, formData, onN
                         </Button>
                     </Form.Item>
                 </Form>
+                <Typography.Text type="secondary">
+                    Уже есть аккаунт? <Link to="/login">Вы можете в него войти!</Link>
+                </Typography.Text>
             </Card>
         </Layout>
     )
